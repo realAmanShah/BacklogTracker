@@ -330,10 +330,17 @@ class SetupWindow(ctk.CTkToplevel):
 
         row_skip = ctk.CTkFrame(info_frame, fg_color="transparent")
         row_skip.pack(fill="x", padx=14, pady=(6, 12))
-        ctk.CTkLabel(row_skip, text="Skip Sunday Live Classes (No growth, study remains active)", font=ctk.CTkFont(size=12, weight="bold"), text_color="white").pack(side="left")
+        
+        
+        ctk.CTkLabel(
+            row_skip, 
+            text="No new lectures on Sunday", 
+            font=ctk.CTkFont(size=12, weight="bold"), 
+            text_color="white"
+        ).pack(side="left")
+        
         self.skip_var = ctk.BooleanVar(value=self.data.get("skip_sunday", True))
         ctk.CTkSwitch(row_skip, text="", variable=self.skip_var, progress_color=ACCENT).pack(side="right")
-
         section(self.scroll, "📋 Quick Curriculums Presets")
         grid_wrapper = ctk.CTkFrame(self.scroll, fg_color="transparent")
         grid_wrapper.pack(fill="x", padx=16, pady=4)
