@@ -308,7 +308,8 @@ class SetupWindow(ctk.CTkToplevel):
         self.geometry("780x820")
         self.title("Setup Wizard — Backlog Tracker")
         self.configure(fg_color=APP_BG)
-        self.grab_set()
+        self.wait_visibility()  
+        self.grab_set()        
         set_window_icon(self)
 
         self.data = data
