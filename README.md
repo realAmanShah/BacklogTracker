@@ -20,15 +20,15 @@ https://github.com/debojitsantra/BacklogTracker/releases/
 
 ### Windows
 
-https://github.com/debojitsantra/BacklogTracker/releases/download/v1.3.0/BacklogTracker_Setup.exe
+https://github.com/debojitsantra/BacklogTracker/releases/download/v1.0.0/BacklogTracker_Setup.exe
 
 ### Linux
 
-https://github.com/debojitsantra/BacklogTracker/releases/download/v1.3.0/BacklogTracker_Linux.tar.gz
+https://github.com/debojitsantra/BacklogTracker/releases/download/v1.0.0/BacklogTracker_Linux.tar.gz
 
 ### macOS (I haven't tested)
 
-https://github.com/debojitsantra/BacklogTracker/releases/download/v1.3.0/BacklogTracker_macOS.zip
+https://github.com/debojitsantra/BacklogTracker/releases/download/v1.0.0/BacklogTracker_macOS.zip
 
 ---
 
