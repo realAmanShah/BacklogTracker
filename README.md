@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="assets/banner.png" width="60%" alt="Backlog Tracker Banner" />
+  <img src="assets/banner.png" width="90%" alt="Backlog Tracker Banner" />
 </p>
 
 <p align="center">
