@@ -8,7 +8,7 @@
 
 <h1 align="center">Backlog Tracker</h1>
 
-<p align="center">A lightweight cross-platform desktop application that helps students calculate, track, and systematically clear academic backlogs.</p>
+<p align="center">A lightweight cross-platform application that helps students calculate, track, and systematically clear academic backlogs.</p>
 
 ---
 
@@ -24,6 +24,8 @@
 
 ## Installation
 
+Android Version Code Here: [Android](https://github.com/debojitsantra/BacklogTracker-Android/)
+
 Download the latest release for your platform:
 
 | Platform | Download |
@@ -31,8 +33,11 @@ Download the latest release for your platform:
 | Windows  | [BacklogTracker_Setup.exe](https://github.com/debojitsantra/BacklogTracker/releases/download/v1.0.0/BacklogTracker_Setup.exe) |
 | Linux    | [BacklogTracker_Linux.tar.gz](https://github.com/debojitsantra/BacklogTracker/releases/download/v1.0.0/BacklogTracker_Linux.tar.gz) |
 | macOS    | [BacklogTracker_macOS.zip](https://github.com/debojitsantra/BacklogTracker/releases/download/v1.0.0/BacklogTracker_macOS.zip) *(untested)* |
+| Android | [BacklogTracker-v1.0.1-Debug.apk](https://github.com/debojitsantra/BacklogTracker-Android/releases)|
+
 
 All releases: [github.com/debojitsantra/BacklogTracker/releases](https://github.com/debojitsantra/BacklogTracker/releases/)
+
 
 <!-- 
 ## Microsoft Store
