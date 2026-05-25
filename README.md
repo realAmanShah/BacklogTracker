@@ -38,12 +38,9 @@ Download the latest release for your platform:
 
 All releases: [github.com/debojitsantra/BacklogTracker/releases](https://github.com/debojitsantra/BacklogTracker/releases/)
 
-
-<!-- 
-## Microsoft Store
-
-[![Microsoft Store](https://get.microsoft.com/images/en-us%20dark.svg)](https://apps.microsoft.com/store/PLACEHOLDER)
--->
+<a href="https://get.microsoft.com/installer/download/9p112ngslvf0?referrer=appbadge" target="_self" >
+	<img src="https://get.microsoft.com/images/en-us%20dark.svg" width="200"/>
+</a>
 
 ---
 
