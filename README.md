@@ -38,11 +38,10 @@ Download the latest release for your platform:
 
 All releases: [github.com/debojitsantra/BacklogTracker/releases](https://github.com/debojitsantra/BacklogTracker/releases/)
 
-<a href="https://get.microsoft.com/installer/download/9p112ngslvf0?referrer=appbadge" target="_self" >
+<a href="https://apps.microsoft.com/detail/9p112ngslvf0?referrer=appbadge&mode=full" target="_blank"  rel="noopener noreferrer">
 	<img src="https://get.microsoft.com/images/en-us%20dark.svg" width="200"/>
 </a>
 
----
 
 ## Local Development
 
