@@ -25,7 +25,7 @@ def get_bundle_dir():
         return sys._MEIPASS
     return os.path.dirname(os.path.abspath(__file__))
 
-# Resolves path to user's icon.ico asset
+
 def get_icon_path():
     bundle_dir = get_bundle_dir()
     path_bundle = os.path.join(bundle_dir, "icon.ico")
@@ -55,17 +55,19 @@ def get_data_filepath():
     return os.path.join(app_dir, "backlog_data.json")
 
 SAVE_FILE = get_data_filepath()
+SIMULATION_ACTIVE = False
 
-# Material Design 3 (MD3) Dark Theme Color Palette Specs
-APP_BG = "#111318"          # MD3 Dark Surface
-CARD_BG = "#1a1c22"         # MD3 Surface Container
-SECONDARY_BG = "#24262f"    # MD3 Surface Container High
-ACCENT = "#a8c7fa"          # MD3 Primary
-ACCENT_LIGHT = "#d2e3fc"    # MD3 Primary Container
-ACCENT_YELLOW = "#f1db7d"   # MD3 Tertiary Container
-TEXT_DIM = "#c4c6d0"        # MD3 On-Surface Variant (Text)
-SUCCESS = "#86d6a5"         # MD3 Safe/Success Custom Tone
-DANGER = "#ffb4ab"          # MD3 Error Custom Tone
+
+
+APP_BG = "#111318"          #  Dark Surface
+CARD_BG = "#1a1c22"         #  Surface Container
+SECONDARY_BG = "#24262f"    #  Surface Container High
+ACCENT = "#a8c7fa"          #  Primary
+ACCENT_LIGHT = "#d2e3fc"    #  Primary Container
+ACCENT_YELLOW = "#f1db7d"   #  Tertiary Container
+TEXT_DIM = "#c4c6d0"        #  On-Surface Text
+SUCCESS = "#86d6a5"         #  Safe/Success Custom Tone
+DANGER = "#ffb4ab"          #  Error Custom Tone
 
 MOTIVATIONAL_QUOTES = [
     "Anxiety guesses. Mathematics calculates. You can clear this!",
@@ -185,6 +187,8 @@ def load_data():
     return dict(DEFAULT_DATA)
 
 def save_data(data):
+    if SIMULATION_ACTIVE:
+        return
     try:
         with open(SAVE_FILE, "w") as f:
             json.dump(data, f, indent=2)
@@ -351,7 +355,7 @@ class SetupWindow(ctk.CTkToplevel):
             if active:
                 self.selected_presets.add(name)
 
-            card = ctk.CTkFrame(grid_wrapper, fg_color=CARD_BG, corner_radius=16) # MD3 Card radius
+            card = ctk.CTkFrame(grid_wrapper, fg_color=CARD_BG, corner_radius=16) # Card radius
             card.grid(row=i // 3, column=i % 3, padx=5, pady=5, sticky="nsew")
 
             btn = ctk.CTkButton(
@@ -359,7 +363,7 @@ class SetupWindow(ctk.CTkToplevel):
                 fg_color=color if active else SECONDARY_BG,
                 hover_color=color,
                 font=ctk.CTkFont(size=11, weight="bold"),
-                text_color=APP_BG if active else TEXT_DIM, # Contrasting typography matching MD3
+                text_color=APP_BG if active else TEXT_DIM,
                 height=32,
                 corner_radius=12,
                 command=lambda n=name, c=color: self.toggle_preset(n, c)
@@ -393,7 +397,7 @@ class SetupWindow(ctk.CTkToplevel):
 
         ctk.CTkButton(self.scroll, text="➕ Append New Custom Subject Row", height=36, corner_radius=18, fg_color=SECONDARY_BG, hover_color=ACCENT, text_color="white", font=ctk.CTkFont(size=11, weight="bold"), command=self.add_custom_row).pack(fill="x", padx=16, pady=8)
         
-        # Pill-shaped primary action button
+        # primary action button
         save_btn = ctk.CTkButton(self.scroll, text="🚀 Apply Setup Configuration", height=44, corner_radius=22, fg_color=SUCCESS, hover_color="#64bd85", text_color=APP_BG, font=ctk.CTkFont(size=13, weight="bold"), command=self.save_setup)
         save_btn.pack(fill="x", padx=16, pady=(12, 16))
 
@@ -502,10 +506,13 @@ class SetupWindow(ctk.CTkToplevel):
 class App(ctk.CTk):
     def __init__(self):
         super().__init__()
-        self.geometry("640x780") 
+        self.geometry("640x900") 
         self.title("Backlog Tracker")
         self.configure(fg_color=APP_BG)
         set_window_icon(self)
+
+        self.is_simulating = False
+        self.real_data = None
 
         self.data = advance_days(load_data())
 
@@ -531,6 +538,10 @@ class App(ctk.CTk):
         self.reload_and_refresh()
 
     def reload_and_refresh(self):
+        global SIMULATION_ACTIVE
+        self.is_simulating = False
+        self.real_data = None
+        SIMULATION_ACTIVE = False
         self.data = load_data()
         for widget in self.winfo_children():
             widget.destroy()
@@ -544,10 +555,15 @@ class App(ctk.CTk):
         title_row.pack(fill="x", padx=16, pady=(14, 2))
         ctk.CTkLabel(title_row, text=f"🎓 {self.data['course_name']}", font=ctk.CTkFont(size=18, weight="bold"), text_color="white").pack(side="left")
 
-        # Configuration button is pill-shaped & highly responsive
+        # Configuration button pill-shaped 
+        def open_config():
+            if self.is_simulating:
+                self.revert_time_simulation()
+            SetupWindow(self, self.data, self.reload_and_refresh)
+
         ctk.CTkButton(
             title_row, text="Configure App ⚙️", width=110, height=28, fg_color=SECONDARY_BG, hover_color=ACCENT, text_color="white",
-            corner_radius=14, font=ctk.CTkFont(size=11, weight="bold"), command=lambda: SetupWindow(self, self.data, self.reload_and_refresh)
+            corner_radius=14, font=ctk.CTkFont(size=11, weight="bold"), command=open_config
         ).pack(side="right")
 
         motivation_frame = ctk.CTkFrame(header_frame, fg_color=SECONDARY_BG, corner_radius=12) # Modern rounded MD3 highlight box
@@ -594,7 +610,7 @@ class App(ctk.CTk):
         self.chart_canvas.pack(fill="x", padx=14, pady=(0, 8))
         self.chart_canvas.bind("<Configure>", lambda event: self.draw_visual_insights())
 
-        # Main scrollable frame to ensure everything sits cleanly inside the fixed depth window bounds
+       
         self.subject_scroll = ctk.CTkScrollableFrame(self, fg_color="transparent")
         self.subject_scroll.pack(fill="both", expand=True, padx=8)
 
@@ -602,13 +618,74 @@ class App(ctk.CTk):
         for s_name, s_data in self.data["subjects"].items():
             self.append_dashboard_card(s_name, s_data)
 
+        # Time Simulator section
+        self.sim_frame = ctk.CTkFrame(self, fg_color=CARD_BG, border_width=1, border_color=SECONDARY_BG, corner_radius=16)
+        self.sim_frame.pack(fill="x", padx=12, pady=(4, 6))
+
+        lbl_sim_title = ctk.CTkLabel(self.sim_frame, text="🚀 Time Simulator (Accumulation Predictor)", font=ctk.CTkFont(size=13, weight="bold"), text_color=ACCENT)
+        lbl_sim_title.pack(anchor="w", padx=14, pady=(10, 2))
+
+        lbl_sim_desc = ctk.CTkLabel(
+            self.sim_frame, 
+            text="Simulate your course release timeline. Fast forward elapsed time to inspect the terrifying compound effects of neglecting core daily watches. Ensure you don't actually lose your active states!", 
+            font=ctk.CTkFont(size=10), 
+            text_color=TEXT_DIM, 
+            wraplength=580, 
+            justify="left"
+        )
+        lbl_sim_desc.pack(anchor="w", padx=14, pady=(0, 10))
+
+        sim_btn_row = ctk.CTkFrame(self.sim_frame, fg_color="transparent")
+        sim_btn_row.pack(fill="x", padx=14, pady=(0, 10))
+
+        self.btn_sim_1d = ctk.CTkButton(
+            sim_btn_row, text="+1 Day Release Growth", height=28, corner_radius=14, 
+            fg_color=SECONDARY_BG, hover_color=ACCENT, font=ctk.CTkFont(size=10, weight="bold"), 
+            command=lambda: self.run_time_simulation(1)
+        )
+        self.btn_sim_1d.pack(side="left", fill="x", expand=True, padx=(0, 4))
+
+        self.btn_sim_7d = ctk.CTkButton(
+            sim_btn_row, text="+1 Week Cumulative", height=28, corner_radius=14, 
+            fg_color=SECONDARY_BG, hover_color=ACCENT, font=ctk.CTkFont(size=10, weight="bold"), 
+            command=lambda: self.run_time_simulation(7)
+        )
+        self.btn_sim_7d.pack(side="left", fill="x", expand=True, padx=4)
+
+        self.btn_sim_30d = ctk.CTkButton(
+            sim_btn_row, text="+30 Days Snowball", height=28, corner_radius=14, 
+            fg_color=SECONDARY_BG, hover_color=ACCENT, font=ctk.CTkFont(size=10, weight="bold"), 
+            command=lambda: self.run_time_simulation(30)
+        )
+        self.btn_sim_30d.pack(side="left", fill="x", expand=True, padx=(4, 0))
+
+        self.sim_status_row = ctk.CTkFrame(self.sim_frame, fg_color="transparent")
+        self.sim_status_row.pack(fill="x", padx=14, pady=(0, 10))
+
+        self.lbl_sim_status = ctk.CTkLabel(self.sim_status_row, text="🟢 Tracking real-time course backlog.", font=ctk.CTkFont(size=10, weight="bold"), text_color=SUCCESS)
+        self.lbl_sim_status.pack(side="left")
+
+        self.btn_revert = ctk.CTkButton(
+            self.sim_status_row, text="Revert to Real ↩️", width=110, height=22, corner_radius=11, 
+            fg_color=SECONDARY_BG, hover_color=SUCCESS, text_color="white", font=ctk.CTkFont(size=10, weight="bold"), 
+            command=self.revert_time_simulation
+        )
+        self.btn_revert.pack(side="right")
+        self.btn_revert.pack_forget()
+
         footer = ctk.CTkFrame(self, fg_color="transparent")
         footer.pack(fill="x", padx=12, pady=6)
 
         self.lbl_eta_date = ctk.CTkLabel(footer, text="", font=ctk.CTkFont(size=11, weight="bold"), text_color=ACCENT)
         self.lbl_eta_date.pack(side="left")
 
-        ctk.CTkButton(footer, text="Sync Changes 🔄", width=120, height=30, corner_radius=15, fg_color=SECONDARY_BG, hover_color=ACCENT, text_color="white", command=self.refresh_dashboard).pack(side="right")
+        def sync_changes():
+            if self.is_simulating:
+                self.revert_time_simulation()
+            else:
+                self.refresh_dashboard()
+
+        ctk.CTkButton(footer, text="Sync Changes 🔄", width=120, height=30, corner_radius=15, fg_color=SECONDARY_BG, hover_color=ACCENT, text_color="white", command=sync_changes).pack(side="right")
         self.refresh_dashboard()
 
     def render_kpi_card(self, parent, title, val, col_idx):
@@ -651,7 +728,7 @@ class App(ctk.CTk):
             if segment_width < 3:
                 continue
 
-            # Draw smooth round segments to honor MD3 rules
+           
             self.chart_canvas.create_rectangle(current_x, bar_y_start, current_x + segment_width, bar_y_start + bar_height, fill=color, outline="")
             current_x += segment_width
 
@@ -694,6 +771,8 @@ class App(ctk.CTk):
         ctk.CTkLabel(sub_row, text="/day", text_color=TEXT_DIM, font=ctk.CTkFont(size=10)).pack(side="left")
 
         def update_growth_rate(*args):
+            if self.is_simulating:
+                self.revert_time_simulation()
             try:
                 val = max(0, int(growth_var.get().strip()))
                 self.data["subjects"][name]["daily_increase"] = val
@@ -718,7 +797,7 @@ class App(ctk.CTk):
         interactions = ctk.CTkFrame(card, fg_color="transparent")
         interactions.pack(fill="x", padx=14, pady=(0, 10))
 
-        # Pill-shaped interaction buttons following MD3 specs
+       
         ctk.CTkButton(interactions, text="➕ Class Added", width=110, height=28, corner_radius=14, fg_color=SECONDARY_BG, hover_color=DANGER, font=ctk.CTkFont(size=10, weight="bold"), command=lambda: self.tweak_backlog_metric(name, 1)).pack(side="left", padx=(0, 6))
         ctk.CTkButton(
             interactions, text="✅ Completed Class", width=130, height=28, corner_radius=14, fg_color=color, 
@@ -743,12 +822,16 @@ class App(ctk.CTk):
             return True
 
     def tweak_backlog_metric(self, name, amount):
+        if self.is_simulating:
+            self.revert_time_simulation()
         curr = self.data["subjects"][name].get("backlog", 0)
         self.data["subjects"][name]["backlog"] = max(0, curr + amount)
         save_data(self.data)
         self.refresh_dashboard()
 
     def update_global_target(self):
+        if self.is_simulating:
+            self.revert_time_simulation()
         try:
             val = max(1, int(self.cpd_input_var.get().strip()))
             self.data["classes_per_day"] = val
@@ -803,6 +886,60 @@ class App(ctk.CTk):
             self.quote_label.configure(text=f"🔥 \"{random.choice(MOTIVATIONAL_QUOTES)}\"")
 
         self.draw_visual_insights()
+
+    def run_time_simulation(self, days):
+        global SIMULATION_ACTIVE
+        if not self.is_simulating:
+            self.real_data = json.loads(json.dumps(self.data))
+            self.is_simulating = True
+            SIMULATION_ACTIVE = True
+
+       
+        self.data = json.loads(json.dumps(self.real_data))
+
+        # Advance days on the copy
+        start_date = date.today()
+        simulated_days = 0
+        for d in range(1, days + 1):
+            sim_day = start_date + timedelta(days=d)
+            if self.data["skip_sunday"] and sim_day.weekday() == 6:
+                continue
+            for _, s in self.data["subjects"].items():
+                s["backlog"] = s.get("backlog", 0) + s.get("daily_increase", 1)
+            simulated_days += 1
+
+        # Update Simulator UI
+        self.lbl_sim_status.configure(
+            text=f"⚠️ Simulation Active: +{days} days ({simulated_days} growth days).", 
+            text_color=DANGER
+        )
+        self.btn_revert.pack(side="right")
+        self.sim_frame.configure(border_color=DANGER)
+
+        # Refresh dashboard to display simulated values
+        self.refresh_dashboard()
+
+    def revert_time_simulation(self):
+        global SIMULATION_ACTIVE
+        if not self.is_simulating:
+            return
+
+        # Restore real data
+        self.data = json.loads(json.dumps(self.real_data))
+        self.real_data = None
+        self.is_simulating = False
+        SIMULATION_ACTIVE = False
+
+        # Reset Simulator UI
+        self.lbl_sim_status.configure(
+            text="🟢 Tracking real-time course backlog.", 
+            text_color=SUCCESS
+        )
+        self.btn_revert.pack_forget()
+        self.sim_frame.configure(border_color=SECONDARY_BG)
+
+        # Refresh dashboard back to real state
+        self.refresh_dashboard()
 
 
 if __name__ == "__main__":
