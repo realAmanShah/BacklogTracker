@@ -19,7 +19,7 @@
 - Sunday-aware ETA prediction
 - Native analytics visualization
 - Motivational productivity prompts
-
+- Time Simulator ( Fast-forward days, weeks, or months )
 ---
 
 ## Installation
