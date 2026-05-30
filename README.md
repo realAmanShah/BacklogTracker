@@ -42,6 +42,15 @@ All releases: [github.com/debojitsantra/BacklogTracker/releases](https://github.
 	<img src="https://get.microsoft.com/images/en-us%20dark.svg" width="200"/>
 </a>
 
+### Linux — Emoji Support
+
+If emojis appear as blank squares, install the Noto Color Emoji font:
+
+```bash
+sudo apt install fonts-noto-color-emoji -y
+```
+
+> Required on Ubuntu/Debian-based distros. Not needed on most modern distros that ship with it by default.
 
 ## Local Development
 
