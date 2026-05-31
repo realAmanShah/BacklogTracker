@@ -88,3 +88,8 @@ git push origin v1.0.2
 ## Author
 
 [github.com/debojitsantra](https://github.com/debojitsantra)
+
+
+  ##  You can help me by Donating
+[![Ko-Fi](https://img.shields.io/badge/Ko--fi-F16061?style=for-the-badge&logo=ko-fi&logoColor=white)](https://ko-fi.com/debojitsantra) 
+[![Donate using Liberapay](https://liberapay.com/assets/widgets/donate.svg)](https://liberapay.com/debojitsantra/donate)
