@@ -1,3 +1,4 @@
+
 <p align="center">
   <img src="assets/banner.png" width="100%" alt="Backlog Tracker Banner" />
 </p>
@@ -9,6 +10,8 @@
 <h1 align="center">Backlog Tracker</h1>
 
 <p align="center">A lightweight cross-platform application that helps students calculate, track, and systematically clear academic backlogs.</p>
+
+![Maintenance](https://img.shields.io/badge/maintenance-temporarily_paused-orange)
 
 ---
 
