@@ -1,68 +1,37 @@
-name: Multi-Platform Release
+name: Build APK
 
 on:
-  push:
-    tags:
-      - 'v*'
   workflow_dispatch:
-
-# Explicitly grant write access to release assets
-permissions:
-  contents: write
 
 jobs:
   build:
-    name: Build on ${{ matrix.os }}
-    runs-on: ${{ matrix.os }}
-    strategy:
-      matrix:
-        os: [windows-latest, ubuntu-latest, macos-latest]
+    runs-on: ubuntu-22.04
 
     steps:
-    - name: Checkout Repository
-      uses: actions/checkout@v4
+      - name: Checkout code
+        uses: actions/checkout@v4
 
-    - name: Set up Python
-      uses: actions/setup-python@v5
-      with:
-        python-version: '3.11'
+      - name: Set up Python
+        uses: actions/checkout@v4
+        with:
+          python-version: '3.10'
 
-    - name: Install Common Dependencies
-      run: |
-        python -m pip install --upgrade pip
-        pip install customtkinter pillow pyinstaller
+      - name: Install dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y build-essential ccache git libffi-dev libssl-dev xclip libsdl2-dev libsdl2-image-dev libsdl2-mixer-dev libsdl2-ttf-dev libportmidi-dev libswscale-dev libavformat-dev libavcodec-dev zlib1g-dev
+          sudo apt-get install -y openjdk-17-jdk unzip zip
+          pip install --upgrade pip
+          pip install buildozer cython
 
-   
-    - name: Build Windows Setup Installer
-      if: matrix.os == 'windows-latest'
-      shell: cmd
-      run: |
-        pyinstaller --noconfirm --onefile --windowed --add-data "icon.ico;." --icon=icon.ico --name "BacklogTracker" backlog_tracker.py
-        "C:\Program Files (x86)\Inno Setup 6\ISCC.exe" setup.iss
+      - name: Build with Buildozer
+        run: |
+          yes | buildozer android debug
+        env:
+          ACCEPT_SHARED_SDK_LICENSE: 1
 
-  
-    - name: Build Linux Portable Binary
-      if: matrix.os == 'ubuntu-latest'
-      run: |
-        pyinstaller --noconfirm --onefile --windowed --add-data "icon.ico:." --name "BacklogTracker" backlog_tracker.py
-        tar -czf dist/BacklogTracker_Linux.tar.gz -C dist BacklogTracker
-
-   
-    - name: Build macOS App Bundle
-      if: matrix.os == 'macos-latest'
-      run: |
-        pyinstaller --noconfirm --onefile --windowed --add-data "icon.ico:." --icon=icon.ico --name "BacklogTracker" backlog_tracker.py
-        cd dist
-        zip -r BacklogTracker_macOS.zip BacklogTracker.app/
-
-    
-    - name: Upload Binary to Release
-      uses: softprops/action-gh-release@v2
-      with:
-        files: |
-          installer_output/BacklogTracker_Setup.exe
-          dist/BacklogTracker_Linux.tar.gz
-          dist/BacklogTracker_macOS.zip
-        fail_on_unmatched_files: false
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - name: Upload APK Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: package-apk
+          path: bin/*.apk
